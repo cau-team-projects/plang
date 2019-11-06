@@ -1,0 +1,6 @@
+plang
+*.out
+*.yy.cc
+*.tab.hh
+*.tab.cc
+location.hh
