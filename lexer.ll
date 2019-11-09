@@ -55,9 +55,11 @@ using token yy::parser::token;
 "=" { return token::ASMT; }
 "(" { return token::OP; }    //Open Parentheses
 ")" { return token::CP; }    //Close Parentheses
-"[" { return token::OS; }    //Open Square bracket
-"]" { return token::CS; }    //Close Square bracket
+"[" { return token::OSB; }    //Open Square bracket
+"]" { return token::CSB; }    //Close Square bracket
 ":" { return token::COLON; }
+" " { return token::SP; }
+"\n" { return token::NL; }
 
 "mainprog" { return token::MAIN; }
 "function" { return token::FUNC; }
