@@ -8,6 +8,8 @@ Driver::Driver() {
     m_parser = std::make_shared<Parser>(this);
 }
 
+Driver::~Driver() {}
+
 bool Driver::parse() {
     return m_parser->parse() == 0;
 }
