@@ -7,9 +7,10 @@
 #define YY_DECL \
 yy::Parser::token_type \
 Lexer::lex( \
-  Parser::semantic_type* yyvlval, \
-  Parser::location_type* yylloc \
+  yy::Parser::semantic_type* yylval, \
+  yy::Parser::location_type* yylloc \
 )
+
 using Token = yy::Parser::token;
 #define yyterminate() return Token::END
 %}
@@ -23,21 +24,19 @@ using Token = yy::Parser::token;
 %{
     yylval = lval;
 %}
-
 ([\n\t\r ]+|"//".*[\n]+|"/*"([^\*]|\*[^/])*"*/") {}
-
 [a-zA-Z][a-zA-Z0-9_]* {
-    strcpy(yylval.id, yytext);
+    yylval->emplace<std::string>(yytext);
     return Token::ID;
 }
 
 [+-]?[0-9]+ {
-    yylval.intval = atoi(yytext);
+    yylval->emplace<int>(std::stoi(yytext));
     return Token::INTVAL
 }
 
 [+-]?([0-9]*\.?[0-9]+|[0-9]+\.) {
-    yylval.floatval = std::stod(yytext);
+    yylval->emplace<double>(std::stod(yytext));
     return Token::FLOATVAL;
 }
 

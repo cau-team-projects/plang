@@ -16,7 +16,7 @@ private:
 public:
     explicit Driver();
     ~Driver();
-    int parse();
+    bool parse();
 };
 
 #endif

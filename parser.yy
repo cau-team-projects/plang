@@ -1,9 +1,11 @@
-
+%{
+%}
 %require "3.2"
 %defines
 %skeleton "lalr1.cc"
 %language "c++"
 %debug
+%define api.prefix {yy}
 %define api.parser.class {Parser}
 %define api.value.type variant
 %define parse.error verbose
@@ -11,9 +13,9 @@
 
 %start program
 
-%token <std::string> ID
-%token <int> INTVAL
-%token <float> FLOATVAL
+%token<std::string> ID
+%token<int> INTVAL
+%token<float> FLOATVAL
 %token INT FLOAT
 %token PLUS MINUS MUL DIV
 %token LT LE GT GE EQ NE NOT
@@ -21,26 +23,28 @@
 %token OP CP
 %token OSB CSB
 %token SP NL
-
 %token MAIN FUNC PROC BEGIN END
 %token IF THEN ELIF ELSE
 %token NOP
 %token WHILE RETURN
 %token PRINT
 %token FOR IN
+
 %parse-param { Driver* driver }
+
 %code requires {
 #include <memory>
 #include "driver.hh"
 }
+
 %{
 #include "lexer.hh"
 #undef yylex
 #define yylex driver->m_lexer->lex
 %}
 
-%%
 
+%%
 program: MAIN ID SEMI declarations subprogram_declarations compound_statement END
 
 declarations: declaration SEMI declarations
@@ -146,3 +150,4 @@ addop: PLUS
 mulop: MUL
     | DIV
 %%
+void yy::Parser::error(const yy::Parser::location_type& loc, const std::string& msg) {}
