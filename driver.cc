@@ -5,7 +5,7 @@
 
 Driver::Driver() {
     m_lexer = std::make_shared<Lexer>();
-    m_parser = std::make_shared<yy::Parser>(this);
+    m_parser = std::make_shared<Parser>(this);
 }
 
 bool Driver::parse() {

@@ -5,13 +5,13 @@
 #include "parser.tab.hh"
 #undef YY_DECL
 #define YY_DECL \
-yy::Parser::token_type \
+Parser::token_type \
 Lexer::lex( \
-  yy::Parser::semantic_type* yylval, \
-  yy::Parser::location_type* yylloc \
+  Parser::semantic_type* yylval, \
+  Parser::location_type* yylloc \
 )
 
-using Token = yy::Parser::token;
+using Token = Parser::token;
 #define yyterminate() return Token::END
 %}
 %option nodefault

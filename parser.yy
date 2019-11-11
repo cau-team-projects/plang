@@ -40,6 +40,7 @@
 #include "lexer.hh"
 #undef yylex
 #define yylex driver->m_lexer->lex
+using Parser = yy::Parser;
 %}
 
 
@@ -149,4 +150,4 @@ addop: PLUS
 mulop: MUL
     | DIV
 %%
-void yy::Parser::error(const yy::Parser::location_type& loc, const std::string& msg) {}
+void Parser::error(const Parser::location_type& loc, const std::string& msg) {}

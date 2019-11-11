@@ -8,11 +8,13 @@ namespace yy {
     class Parser;
 };
 
+using Parser = yy::Parser;
+
 class Driver {
 private:
     std::shared_ptr<Lexer> m_lexer;
-    std::shared_ptr<yy::Parser> m_parser;
-    friend class yy::Parser;
+    std::shared_ptr<Parser> m_parser;
+    friend Parser;
 public:
     explicit Driver();
     ~Driver();
