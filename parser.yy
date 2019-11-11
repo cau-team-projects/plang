@@ -5,7 +5,6 @@
 %skeleton "lalr1.cc"
 %language "c++"
 %debug
-%define api.prefix {yy}
 %define api.parser.class {Parser}
 %define api.value.type variant
 %define parse.error verbose
@@ -23,7 +22,7 @@
 %token OP CP
 %token OSB CSB
 %token SP NL
-%token MAIN FUNC PROC BEGIN END
+%token MAIN FUNC PROC BEG END
 %token IF THEN ELIF ELSE
 %token NOP
 %token WHILE RETURN
@@ -51,8 +50,8 @@ declarations: declaration SEMI declarations
     | %empty
 
 declaration: type identifier_list
-   
-identifier_list: ID 
+
+identifier_list: ID
     | ID COMMA identifier_list
 
 type: standard_type
@@ -75,7 +74,7 @@ arguments: OP parameter_list CP
 parameter_list: identifier_list COLON type
     | identifier_list COLON type SEMI parameter_list
 
-compound_statement: BEGIN statement_list END
+compound_statement: BEG statement_list END
 
 statement_list: statement
     | statement SEMI statement_list

@@ -21,9 +21,6 @@ using Token = yy::Parser::token;
 %option yyclass="Lexer"
 %%
 
-%{
-    yylval = lval;
-%}
 ([\n\t\r ]+|"//".*[\n]+|"/*"([^\*]|\*[^/])*"*/") {}
 [a-zA-Z][a-zA-Z0-9_]* {
     yylval->emplace<std::string>(yytext);
@@ -32,7 +29,7 @@ using Token = yy::Parser::token;
 
 [+-]?[0-9]+ {
     yylval->emplace<int>(std::stoi(yytext));
-    return Token::INTVAL
+    return Token::INTVAL;
 }
 
 [+-]?([0-9]*\.?[0-9]+|[0-9]+\.) {
@@ -69,7 +66,7 @@ using Token = yy::Parser::token;
 "mainprog" { return Token::MAIN; }
 "function" { return Token::FUNC; }
 "procedure" { return Token::PROC; }
-"begin" { return Token::BEGIN; }
+"begin" { return Token::BEG; }
 "end" { return Token::END; }
 "if" { return Token::IF; }
 "then" { return Token::THEN; }
