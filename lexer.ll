@@ -1,17 +1,23 @@
-/*
-    김명승 작성
-    tab대신 space 4번
-*/
-
 %{
-#include <cstring>
-#define yyterminate() return token::END
-
-using token yy::parser::token;
+#include <memory>
+#include <string>
+#include "lexer.hh"
+#include "parser.tab.hh"
+#undef YY_DECL
+#define YY_DECL \
+Parser::token_type \
+Lexer::lex( \
+  Parser::semantic_type* yyvlval, \
+  Parser::location_type* yylloc \
+)
+using Token = yy::parser::token;
+#define yyterminate() return Token::END
 %}
-
+%option nodefault
+%option noyywrap
+%option nounput
 %option c++
-
+%option yyclass="Lexer"
 %%
 
 %{
@@ -22,59 +28,61 @@ using token yy::parser::token;
 
 [a-zA-Z][a-zA-Z0-9_]* {
     strcpy(yylval.id, yytext);
-    return token::ID;
+    return Token::ID;
 }
 
 [+-]?[0-9]+ {
     yylval.intval = atoi(yytext);
-    return token::INTVAL
+    return Token::INTVAL
 }
 
 [+-]?([0-9]*\.?[0-9]+|[0-9]+\.) {
-    yylval.floatval = atoi(yytext);
-    return token::FLOATVAL;
+    yylval.floatval = std::stod(yytext);
+    return Token::FLOATVAL;
 }
 
-"int" { return token::INT; }
-"float" { return token::FLOAT; }
+"int" { return Token::INT; }
+"float" { return Token::FLOAT; }
 
-"+" { return token::PLUS; }
-"-" { return token::MINUS; }
-"*" { return token::MUL; }
-"/" { return token::DIV; }
-"<" { return token::LT; }
-"<=" { return token::LE; }
-">=" { return token::GE; }
-">" { return token::GT; }
-"==" { return token::EQ; }
-"!=" { return token::NE; }
-"!" { return token::NOT; }
-";" { return token::SEMI; }
-"." { return token::DOT; }
-"," { return token::COMMA; }
-"=" { return token::ASMT; }
-"(" { return token::OP; }    //Open Parentheses
-")" { return token::CP; }    //Close Parentheses
-"[" { return token::OSB; }    //Open Square bracket
-"]" { return token::CSB; }    //Close Square bracket
-":" { return token::COLON; }
-" " { return token::SP; }
-"\n" { return token::NL; }
+"+" { return Token::PLUS; }
+"-" { return Token::MINUS; }
+"*" { return Token::MUL; }
+"/" { return Token::DIV; }
+"<" { return Token::LT; }
+"<=" { return Token::LE; }
+">=" { return Token::GE; }
+">" { return Token::GT; }
+"==" { return Token::EQ; }
+"!=" { return Token::NE; }
+"!" { return Token::NOT; }
+";" { return Token::SEMI; }
+"." { return Token::DOT; }
+"," { return Token::COMMA; }
+"=" { return Token::ASMT; }
+"(" { return Token::OP; }
+")" { return Token::CP; }
+"[" { return Token::OSB; }
+"]" { return Token::CSB; }
+":" { return Token::COLON; }
+" " { return Token::SP; }
+"\n" { return Token::NL; }
 
-"mainprog" { return token::MAIN; }
-"function" { return token::FUNC; }
-"procedure" { return token::PROC; }
-"begin" { return token::BEGIN; }
-"end" { return token::END; }
-"if" { return token::IF; }
-"then" { return token::THEN; }
-"elif" { return token::ELIF; }
-"else" { return token::ELSE; }
-"nop" { return token::NOP; }
-"while" { return token::WHILE; }
-"return" { return token::RETURN; }
-"print" { return token::PRINT; }
-"for" { return token::FOR; }
-"in" { return token::IN; }
-
+"mainprog" { return Token::MAIN; }
+"function" { return Token::FUNC; }
+"procedure" { return Token::PROC; }
+"begin" { return Token::BEGIN; }
+"end" { return Token::END; }
+"if" { return Token::IF; }
+"then" { return Token::THEN; }
+"elif" { return Token::ELIF; }
+"else" { return Token::ELSE; }
+"nop" { return Token::NOP; }
+"while" { return Token::WHILE; }
+"return" { return Token::RETURN; }
+"print" { return Token::PRINT; }
+"for" { return Token::FOR; }
+"in" { return Token::IN; }
 %%
+#ifdef yylex
+#undef yylex
+#endif
