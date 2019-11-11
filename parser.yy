@@ -41,10 +41,12 @@
 
 %%
 
-program: MAIN ID SEMI declaration subprogram_declarations compound_statement END
+program: MAIN ID SEMI declarations subprogram_declarations compound_statement END
 
-declaration: type identifier_list SEMI declaration
-   | %empty
+declarations: declaration SEMI declarations
+    | %empty
+
+declaration: type identifier_list
    
 identifier_list: ID 
     | ID COMMA identifier_list
@@ -84,7 +86,7 @@ statement: variable ASMT expression
     | RETURN expression
     | NOP
 
-if_statement: IF expression COLON statement elifs else
+if_statement: IF expression COLON statement elifs ELSE COLON statement
     | IF expression COLON statement elifs
 
 elifs: elif elifs
