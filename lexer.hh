@@ -7,12 +7,13 @@
 #include "parser.tab.hh"
 
 class Lexer: public yyFlexLexer {
+public:
     explicit Lexer();
     virtual ~Lexer();
-    Parser::token_type lex(
-        Parser::semantic_type* yylval,
-        Parser::location_type* yylloc
+    yy::Parser::token_type lex(
+        yy::Parser::semantic_type* yylval,
+        yy::Parser::location_type* yylloc
     );
-}
+};
 
 #endif

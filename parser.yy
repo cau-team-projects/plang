@@ -30,13 +30,13 @@
 %token FOR IN
 %parse-param { Driver* driver }
 %code requires {
-#include <memry>
+#include <memory>
 #include "driver.hh"
 }
 %{
 #include "lexer.hh"
 #undef yylex
-#define yylex driver->lexer->lex
+#define yylex driver->m_lexer->lex
 %}
 
 %%
