@@ -18,6 +18,9 @@ using Token = Parser::token;
 %option nodefault
 %option noyywrap
 %option nounput
+%option stack
+%option batch
+%option debug
 %option c++
 %option yyclass="Lexer"
 %%
@@ -42,8 +45,8 @@ using Token = Parser::token;
 "[" { return Token::OSB; }
 "]" { return Token::CSB; }
 ":" { return Token::COLON; }
-" " { return Token::SP; }
-"\n" { return Token::LF; }
+" " { /*return Token::SP;*/ }
+"\n" { /*return Token::LF;*/ }
 
 "int" { return Token::INT; }
 "float" { return Token::FLOAT; }
@@ -81,7 +84,7 @@ using Token = Parser::token;
     return Token::FLOATVAL;
 }
 
-. { printf("ANY: %s\n", yytext); }
+. {}
 
 %%
 #ifdef yylex

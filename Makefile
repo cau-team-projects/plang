@@ -1,5 +1,6 @@
 CXXFLAGS := -g -pg
 CXXFLAGS += -fsanitize=address,leak
+BFLAGS += --debug -t
 
 all: plang
 
@@ -10,7 +11,7 @@ lexer.yy.cc: lexer.ll
 	${LEX} ${LFLAGS} -o $@ $^
 
 parser.tab.cc: parser.yy
-	bison $^
+	bison ${BFLAGS} $^
 
 .PHONY: clean
 clean:

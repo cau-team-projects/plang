@@ -19,13 +19,13 @@
 %token SEMI DOT COMMA ASMT COLON
 %token OP CP
 %token OSB CSB
-%token SP LF
 %token MAIN FUNC PROC BEG END
 %token IF THEN ELIF ELSE
 %token NOP
 %token WHILE RETURN
 %token PRINT
 %token FOR IN
+%token SP LF
 
 %printer { yyoutput << "parser.yy" << $$ << std::endl; } ID
 
