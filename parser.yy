@@ -1,5 +1,3 @@
-%{
-%}
 %require "3.2"
 %defines
 %skeleton "lalr1.cc"
@@ -42,7 +40,6 @@
 #define yylex driver->m_lexer->lex
 using Parser = yy::Parser;
 %}
-
 
 %%
 program: MAIN ID SEMI declarations subprogram_declarations compound_statement END
@@ -128,26 +125,27 @@ term: factor
     | factor mulop term
 
 factor: INTVAL
-    | FLOATVAL
-    | variable
-    | procedure_statement
-    | NOT factor
-    | sign factor
+     | FLOATVAL
+     | variable
+     | procedure_statement
+     | NOT factor
+     | sign factor
 
 sign: PLUS
     | MINUS
 
 relop: GT
-    | GE
-    | LT
-    | LE
-    | EQ
-    | NE
-    | IN
+     | GE
+     | LT
+     | LE
+     | EQ
+     | NE
+     | IN
 
 addop: PLUS
     | MINUS
 mulop: MUL
     | DIV
 %%
+
 void Parser::error(const Parser::location_type& loc, const std::string& msg) {}

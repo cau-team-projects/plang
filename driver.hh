@@ -1,6 +1,7 @@
 #ifndef DRIVER_HH
 #define DRIVER_HH
 
+#include <iostream>
 #include <memory>
 
 class Lexer;
@@ -16,7 +17,7 @@ private:
     std::shared_ptr<Parser> m_parser;
     friend Parser;
 public:
-    explicit Driver();
+    explicit Driver(std::istream& in = std::cin, std::ostream& out = std::cout);
     ~Driver();
     bool parse();
 };

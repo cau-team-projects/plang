@@ -1,7 +1,7 @@
 #include "lexer.hh"
 
-Lexer::Lexer():
-yyFlexLexer{std::cin, std::cout}
+Lexer::Lexer(std::istream& in, std::ostream& out):
+yyFlexLexer{in, out}
 {}
 
 Lexer::~Lexer()
