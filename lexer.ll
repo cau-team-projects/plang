@@ -1,4 +1,5 @@
 %{
+#include <cstdio>
 #include <memory>
 #include <string>
 #include "lexer.hh"
@@ -21,25 +22,6 @@ using Token = Parser::token;
 %option yyclass="Lexer"
 %%
 
-([\n\t\r ]+|"//".*[\n]+|"/*"([^\*]|\*[^/])*"*/") {}
-[a-zA-Z][a-zA-Z0-9_]* {
-    yylval->emplace<std::string>(yytext);
-    return Token::ID;
-}
-
-[+-]?[0-9]+ {
-    yylval->emplace<int>(std::stoi(yytext));
-    return Token::INTVAL;
-}
-
-[+-]?([0-9]*\.?[0-9]+|[0-9]+\.) {
-    yylval->emplace<double>(std::stod(yytext));
-    return Token::FLOATVAL;
-}
-
-"int" { return Token::INT; }
-"float" { return Token::FLOAT; }
-
 "+" { return Token::PLUS; }
 "-" { return Token::MINUS; }
 "*" { return Token::MUL; }
@@ -61,8 +43,10 @@ using Token = Parser::token;
 "]" { return Token::CSB; }
 ":" { return Token::COLON; }
 " " { return Token::SP; }
-"\n" { return Token::NL; }
+"\n" { return Token::LF; }
 
+"int" { return Token::INT; }
+"float" { return Token::FLOAT; }
 "mainprog" { return Token::MAIN; }
 "function" { return Token::FUNC; }
 "procedure" { return Token::PROC; }
@@ -78,6 +62,27 @@ using Token = Parser::token;
 "print" { return Token::PRINT; }
 "for" { return Token::FOR; }
 "in" { return Token::IN; }
+
+[A-z_][A-z0-9_]* {
+    printf("ID: %s\n", yytext);
+    yylval->emplace<std::string>(yytext);
+    return Token::ID;
+}
+
+[+-]?[0-9]+ {
+    printf("INTVAL: %s\n", yytext);
+    yylval->emplace<int>(std::stoi(yytext));
+    return Token::INTVAL;
+}
+
+[+-]?([0-9]+\.[0-9]+|\.[0-9]+|[0-9]+\.) {
+    printf("FLOATVAL: %s\n", yytext);
+    yylval->emplace<double>(std::stod(yytext));
+    return Token::FLOATVAL;
+}
+
+. { printf("ANY: %s\n", yytext); }
+
 %%
 #ifdef yylex
 #undef yylex
