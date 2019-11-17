@@ -19,7 +19,9 @@ using Token = Parser::token;
 %option nounput
 %option stack
 %option batch
+%option verbose
 %option debug
+%option warn
 %option c++
 %option yyclass="Lexer"
 %%
@@ -66,19 +68,16 @@ using Token = Parser::token;
 "in" { return Token::IN; }
 
 [A-z_][A-z0-9_]* {
-    yyout << "ID: " << yytext << std::endl;
     yylval->emplace<std::string>(yytext);
     return Token::ID;
 }
 
 [+-]?[0-9]+ {
-    yyout << "INTVAL:" << yytext << std::endl;
     yylval->emplace<int>(std::stoi(yytext));
     return Token::INTVAL;
 }
 
 [+-]?([0-9]+\.[0-9]+|\.[0-9]+|[0-9]+\.) {
-    yyout << "FLOATVAL: " << yytext << std::endl;
     yylval->emplace<double>(std::stod(yytext));
     return Token::FLOATVAL;
 }
