@@ -1,6 +1,5 @@
 CXXFLAGS := -g -pg
 CXXFLAGS += -fsanitize=address,leak
-BFLAGS += --debug -t
 
 all: plang
 

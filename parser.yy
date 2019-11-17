@@ -2,10 +2,10 @@
 %defines
 %skeleton "lalr1.cc"
 %language "c++"
-%debug
 %define api.parser.class {Parser}
 %define api.value.type variant
 %define parse.error verbose
+%define parse.trace
 %locations
 
 %start program
@@ -27,7 +27,7 @@
 %token FOR IN
 %token SP LF
 
-%printer { yyoutput << "parser.yy" << $$ << std::endl; } ID
+%printer { yyo << "parser.yy" << $$ << std::endl; } ID
 
 %parse-param { Driver* driver }
 
@@ -41,6 +41,7 @@
 #undef yylex
 #define yylex driver->m_lexer->lex
 using Parser = yy::Parser;
+#define YYDEBUG 1
 %}
 
 %%
