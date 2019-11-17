@@ -79,13 +79,23 @@ using Token = Parser::token;
 }
 
 [+-]?[0-9]+ {
-    yylval->emplace<int>(std::stoi(yytext));
-    return Token::INTVAL;
+    try {
+        yylval->emplace<int>(std::stoi(yytext));
+        return Token::INTVAL;
+    } catch(std::out_of_range& e) {
+        std::cerr << "INTVAL too large!" << std::endl;
+        yyterminate();
+    }
 }
 
 [+-]?([0-9]+\.[0-9]+|\.[0-9]+|[0-9]+\.) {
-    yylval->emplace<double>(std::stod(yytext));
-    return Token::FLOATVAL;
+    try {
+        yylval->emplace<double>(std::stod(yytext));
+        return Token::FLOATVAL;
+    } catch(std::out_of_range& e) {
+        std::cerr << "FLOATVAL too large!" << std::endl;
+        yyterminate();
+    }
 }
 
 . {
