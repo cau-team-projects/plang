@@ -1,5 +1,4 @@
 %{
-#include <cstdio>
 #include <memory>
 #include <string>
 #include "lexer.hh"
@@ -67,19 +66,19 @@ using Token = Parser::token;
 "in" { return Token::IN; }
 
 [A-z_][A-z0-9_]* {
-    printf("ID: %s\n", yytext);
+    yyout << "ID: " << yytext << std::endl;
     yylval->emplace<std::string>(yytext);
     return Token::ID;
 }
 
 [+-]?[0-9]+ {
-    printf("INTVAL: %s\n", yytext);
+    yyout << "INTVAL:" << yytext << std::endl;
     yylval->emplace<int>(std::stoi(yytext));
     return Token::INTVAL;
 }
 
 [+-]?([0-9]+\.[0-9]+|\.[0-9]+|[0-9]+\.) {
-    printf("FLOATVAL: %s\n", yytext);
+    yyout << "FLOATVAL: " << yytext << std::endl;
     yylval->emplace<double>(std::stod(yytext));
     return Token::FLOATVAL;
 }
