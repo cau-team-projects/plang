@@ -27,7 +27,7 @@
 %token FOR IN
 %token SP LF
 
-%printer { yyo << "parser.yy" << $$ << std::endl; } ID
+%printer { yyo << $$; } ID
 
 %parse-param { Driver* driver }
 

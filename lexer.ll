@@ -10,7 +10,7 @@ Lexer::lex( \
   Parser::semantic_type* yylval, \
   Parser::location_type* yylloc \
 )
-
+#define YY_USER_ACTION yylloc->columns(yyleng);
 using Token = Parser::token;
 #define yyterminate() return Token::END
 %}
@@ -25,6 +25,10 @@ using Token = Parser::token;
 %option c++
 %option yyclass="Lexer"
 %%
+
+%{
+    yylloc->step();
+%}
 
 "+" { return Token::PLUS; }
 "-" { return Token::MINUS; }
@@ -46,8 +50,10 @@ using Token = Parser::token;
 "[" { return Token::OSB; }
 "]" { return Token::CSB; }
 ":" { return Token::COLON; }
-" " { /*return Token::SP;*/ }
-"\n" { /*return Token::LF;*/ }
+"\t" { yylloc->step(); /*return Token::TAB;*/ }
+" " { yylloc->step(); /*return Token::SP;*/ }
+"\r" { yylloc->step(); /*return Token::SP;*/ }
+"\n" { yylloc->lines(yyleng); yylloc->step(); /*return Token::LF;*/ }
 
 "int" { return Token::INT; }
 "float" { return Token::FLOAT; }
@@ -82,7 +88,10 @@ using Token = Parser::token;
     return Token::FLOATVAL;
 }
 
-. {}
+. {
+    std::cerr << "Invalid Token" << yytext << std::endl;
+    yyterminate();
+}
 
 %%
 #ifdef yylex
