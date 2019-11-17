@@ -7,6 +7,9 @@
 %define parse.error verbose
 %define parse.trace
 %locations
+%initial-action {
+    @$.begin.filename = @$.end.filename = &driver->m_ifname;
+}
 
 %start program
 
@@ -151,4 +154,6 @@ mulop: MUL
      | DIV
 %%
 
-void Parser::error(const Parser::location_type& loc, const std::string& msg) {}
+void Parser::error(const Parser::location_type& loc, const std::string& msg) {
+    driver->error(loc, msg);
+}
