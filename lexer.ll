@@ -12,7 +12,7 @@ Lexer::lex( \
 )
 #define YY_USER_ACTION yylloc->columns(yyleng);
 using Token = Parser::token;
-#define yyterminate() return Token::END
+#define yyterminate() return Token::FIN
 %}
 %option nodefault
 %option noyywrap

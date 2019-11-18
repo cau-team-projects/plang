@@ -1,5 +1,6 @@
 plang
 *.out
+*.output
 *.yy.cc
 *.tab.hh
 *.tab.cc

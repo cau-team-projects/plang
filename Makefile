@@ -1,5 +1,6 @@
 CXXFLAGS += -g -pg
 CXXFLAGS += -fsanitize=address,leak
+BFLAGS += -v
 
 all: plang
 

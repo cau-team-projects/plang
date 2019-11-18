@@ -12,7 +12,7 @@
 }
 
 %start program
-
+%token FIN
 %token<std::string> ID
 %token<int> INTVAL
 %token<double> FLOATVAL
@@ -48,7 +48,7 @@ using Parser = yy::Parser;
 %}
 
 %%
-program: MAIN ID SEMI declarations subprogram_declarations compound_statement
+program: MAIN ID SEMI declarations subprogram_declarations compound_statement FIN { return 0; }
 
 declarations: declaration SEMI declarations
             | %empty
