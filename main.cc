@@ -18,7 +18,7 @@ int main(int argc, const char* argv[]) {
         driver = std::make_unique<Driver>(argv[1], out);
         break;
     }
-#ifndef PROD
+#ifdef DEBUG
     driver->setDebugging(1);
 #endif
     return driver->parse();
