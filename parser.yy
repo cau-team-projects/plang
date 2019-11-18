@@ -15,7 +15,7 @@
 
 %token<std::string> ID
 %token<int> INTVAL
-%token<float> FLOATVAL
+%token<double> FLOATVAL
 %token INT FLOAT
 %token PLUS MINUS MUL DIV
 %token LT LE GT GE EQ NE NOT
