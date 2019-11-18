@@ -23,7 +23,7 @@
 %token OP CP
 %token OSB CSB
 %token MAIN FUNC PROC BEG END
-%token IF THEN ELIF ELSE
+%token IF ELIF ELSE
 %token NOP
 %token WHILE RETURN
 %token PRINT

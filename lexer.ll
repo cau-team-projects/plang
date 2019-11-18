@@ -63,7 +63,6 @@ using Token = Parser::token;
 "begin" { return Token::BEG; }
 "end" { return Token::END; }
 "if" { return Token::IF; }
-"then" { return Token::THEN; }
 "elif" { return Token::ELIF; }
 "else" { return Token::ELSE; }
 "nop" { return Token::NOP; }
