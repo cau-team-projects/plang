@@ -13,8 +13,8 @@ Driver::Driver(std::istream& in, std::ostream& out) {
 
 Driver::Driver(const std::string& ifname, std::ostream& out) {
     m_ifname = ifname;
-    std::ifstream in{m_ifname};
-    m_lexer = std::make_shared<Lexer>(in, out);
+    m_ifile.open(m_ifname);
+    m_lexer = std::make_shared<Lexer>(m_ifile, out);
     m_parser = std::make_shared<Parser>(this);
 }
 

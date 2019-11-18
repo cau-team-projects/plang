@@ -1,6 +1,7 @@
 #ifndef DRIVER_HH
 #define DRIVER_HH
 
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include "location.hh"
@@ -18,6 +19,7 @@ private:
     std::shared_ptr<Lexer> m_lexer;
     std::shared_ptr<Parser> m_parser;
     std::string m_ifname;
+    std::ifstream m_ifile;
     friend Parser;
 public:
     explicit Driver(std::istream& in = std::cin, std::ostream& out = std::cout);
