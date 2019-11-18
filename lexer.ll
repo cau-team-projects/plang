@@ -52,8 +52,8 @@ using Token = Parser::token;
 ":" { return Token::COLON; }
 "\t" { yylloc->step(); /*return Token::TAB;*/ }
 " " { yylloc->step(); /*return Token::SP;*/ }
-"\r" { yylloc->step(); /*return Token::SP;*/ }
-"\n" { yylloc->lines(yyleng); yylloc->step(); /*return Token::LF;*/ }
+\r {}
+\n+ { yylloc->lines(yyleng); yylloc->step(); /*return Token::LF;*/ }
 
 "int" { return Token::INT; }
 "float" { return Token::FLOAT; }

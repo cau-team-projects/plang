@@ -22,15 +22,20 @@
 %token SEMI DOT COMMA ASMT COLON
 %token OP CP
 %token OSB CSB
-%token MAIN FUNC PROC BEG END
+%token MAIN FUNC PROC
+%token BEG END
 %token IF ELIF ELSE
 %token NOP
-%token WHILE RETURN
+%token WHILE
+%token RETURN
 %token PRINT
 %token FOR IN
-%token SP LF
+%token SP TAB
+%token LF
 
-%printer { yyo << $$; } ID
+%left MUL DIV
+%left PLUS MINUS
+%left LT LE GT GE EQ NE IN
 
 %parse-param { Driver* driver }
 
@@ -93,8 +98,8 @@ statement: variable ASMT expression
          | RETURN expression
          | NOP
 
-if_statement: IF expression COLON statement elifs ELSE COLON statement
-            | IF expression COLON statement elifs
+if_statement: IF expression COLON statement elifs ELSE COLON statement END
+            | IF expression COLON statement elifs END
 
 elifs: elif elifs
      | %empty
@@ -103,7 +108,7 @@ elif: ELIF expression COLON statement
 
 while_statement: WHILE expression COLON statement
 
-for_statement: FOR expression IN expression COLON statement
+for_statement: FOR type ID IN expression COLON statement
 
 print_statement: PRINT
                | PRINT OP expression CP
@@ -120,10 +125,10 @@ expression_list: expression
                | expression COMMA expression_list
 
 expression: simple_expression
-          | simple_expression relop simple_expression
+          | simple_expression relop expression
 
 simple_expression: term
-    | term addop simple_expression
+                 | term addop simple_expression
 
 term: factor
     | factor mulop term
@@ -148,6 +153,7 @@ relop: GT
 
 addop: PLUS
      | MINUS
+
 mulop: MUL
      | DIV
 %%

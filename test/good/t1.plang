@@ -1,37 +1,38 @@
 mainprog myprog;
 
 int var1;
-int[5] arr1;
 float var2;
+int [ 10 ] arr1;
 
 function myfunc(arg1: int): int;
-  int[10] var1;
+  int [ 10 ] var1;
 begin
-  var1[4 + 2 * 2] = 3 * 6;
-  print(1.1);
-  return 10;
+  var1 [ 4 + 2 * 2 ] = 3 * 6;
+  print( 1.1 );
+  return 13
 end
 
 procedure myproc(arg1: float; arg2: float);
   int i;
 begin
   if i > 5:
-    print(8);
+    print(8)
   elif i > 3:
-    print(1257);
+    print(1257)
   else:
-    print(65);
+    print(65)
+  end;
 
   while !1:
-    print(1234 / 2);
+    print(1234 / 2)
+  ;
 
   print(123 + 456);
 
-  for 7 in 5:
-    print(7.8);
+  for int i in 5:
+    print(i)
+  ;
   print(2.9);
-
   nop;
-
-  print(6);
+  print(6)
 end
