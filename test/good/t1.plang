@@ -7,29 +7,31 @@ float var2;
 function myfunc(arg1: int): int;
   int[10] var1;
 begin
-  var1[ 4 + 2 * 2 ] = 3 * 6;
-  print(1.1)
+  var1[4 + 2 * 2] = 3 * 6;
+  print(1.1);
+  return 10;
 end
 
 procedure myproc(arg1: float; arg2: float);
   int i;
 begin
-  var1 ( 1.1 * 0.7, 0.3 / 0.6 - 2.1 + 2.9 );
-  if i > 5 :
-    print(8)
-  elif i > 3 :
-    print(1257)
-  else :
+  if i > 5:
+    print(8);
+  elif i > 3:
+    print(1257);
+  else:
     print(65);
-  while !1 :
-    print(1234 / 2)
-  else :
-    print(123 + 456);
-  for 7 in 5 :
-    print (7.8)
-  else :
-    print(2.9);
+
+  while !1:
+    print(1234 / 2);
+
+  print(123 + 456);
+
+  for 7 in 5:
+    print(7.8);
+  print(2.9);
+
   nop;
-  print(6)
-  return 5 - 3;
+
+  print(6);
 end
