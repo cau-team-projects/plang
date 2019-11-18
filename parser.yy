@@ -102,10 +102,8 @@ elifs: elif elifs
 elif: ELIF expression COLON statement
 
 while_statement: WHILE expression COLON statement
-               | WHILE expression COLON statement ELSE COLON statement
 
 for_statement: FOR expression IN expression COLON statement
-             | FOR expression IN expression COLON statement ELSE COLON statement
 
 print_statement: PRINT
                | PRINT OP expression CP
