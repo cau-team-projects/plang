@@ -48,7 +48,7 @@ using Parser = yy::Parser;
 %}
 
 %%
-program: MAIN ID SEMI declarations subprogram_declarations compound_statement END
+program: MAIN ID SEMI declarations subprogram_declarations compound_statement
 
 declarations: declaration SEMI declarations
             | %empty
