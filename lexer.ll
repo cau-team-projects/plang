@@ -72,7 +72,7 @@ using Token = Parser::token;
 "for" { return Token::FOR; }
 "in" { return Token::IN; }
 
-[A-z_][A-z0-9_]* {
+[A-Za-z_][A-Za-z0-9_]* {
     yylval->emplace<std::string>(yytext);
     return Token::ID;
 }
