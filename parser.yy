@@ -54,7 +54,7 @@ using Parser = yy::Parser;
 program: MAIN ID declaration_list subprogram_declaration_list compound_statement FIN { return 0; }
 
 declaration_list: declaration declaration_list
-            | %empty
+                | %empty
 
 declaration: type identifier_list
 
