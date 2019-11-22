@@ -19,20 +19,18 @@
 %token INT FLOAT
 %token PLUS MINUS MUL DIV
 %token LT LE GT GE EQ NE NOT
-%token SEMI DOT COMMA ASMT COLON
+%token COMMA ASMT COLON
 %token OP CP
 %token OSB CSB
 %token MAIN FUNC PROC
 %token BEG END
-%token IF ELIF ELSE
+%token IF ELIF ELSE THEN
 %token NOP
-%token WHILE
+%token WHILE DO
 %token RETURN
 %token PRINT
 %token FOR IN
-%token SP TAB
-%token LF
-
+%token SEMI DOT
 %left MUL DIV
 %left PLUS MINUS
 %left LT LE GT GE EQ NE IN
@@ -53,9 +51,9 @@ using Parser = yy::Parser;
 %}
 
 %%
-program: MAIN ID SEMI declarations subprogram_declarations compound_statement FIN { return 0; }
+program: MAIN ID declaration_list subprogram_declaration_list compound_statement FIN { return 0; }
 
-declarations: declaration SEMI declarations
+declaration_list: declaration declaration_list
             | %empty
 
 declaration: type identifier_list
@@ -69,24 +67,21 @@ type: standard_type
 standard_type: INT
              | FLOAT
 
-subprogram_declarations: subprogram_declaration subprogram_declarations
+subprogram_declaration_list: subprogram_declaration subprogram_declaration_list
                        | %empty
 
-subprogram_declaration: subprogram_head declarations compound_statement
+subprogram_declaration: subprogram_head declaration_list compound_statement
 
-subprogram_head: FUNC ID arguments COLON standard_type SEMI
-               | PROC ID arguments SEMI
+subprogram_head: FUNC ID arguments COLON standard_type
+               | PROC ID arguments
 
-arguments: OP parameter_list CP
+arguments: OP declaration_list CP
          | %empty
-
-parameter_list: identifier_list COLON type
-              | identifier_list COLON type SEMI parameter_list
 
 compound_statement: BEG statement_list END
 
 statement_list: statement
-              | statement SEMI statement_list
+              | statement statement_list
 
 statement: variable ASMT expression
          | print_statement
@@ -98,17 +93,17 @@ statement: variable ASMT expression
          | RETURN expression
          | NOP
 
-if_statement: IF expression COLON statement elifs ELSE COLON statement END
-            | IF expression COLON statement elifs END
+if_statement: IF expression THEN statement elifs ELSE statement END
+            | IF expression THEN statement elifs END
 
 elifs: elif elifs
      | %empty
 
-elif: ELIF expression COLON statement
+elif: ELIF expression THEN statement
 
-while_statement: WHILE expression COLON statement
+while_statement: WHILE expression DO statement END
 
-for_statement: FOR type ID IN expression COLON statement
+for_statement: FOR type ID IN expression DO statement END
 
 print_statement: PRINT
                | PRINT OP expression CP

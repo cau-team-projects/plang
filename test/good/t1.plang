@@ -1,39 +1,36 @@
-mainprog myprog;
+mainprog myprog
 
-int var1;
-float var2;
-int[10] arr1;
+int var1
+float var2
+int[10] arr1
 
-function myfunc(arg1: int): int;
-  int[10] var1;
+function myfunc(int arg1): int
+  int[10] var1
 begin
-  var1[4 + 2 * 2] = 3 * 6;
-  print(1.1);
+  var1[4 + 2 * 2] = 3 * 6
+  print(1.1)
   return 13
 end
 
-procedure myproc(arg1: float; arg2: float);
-  int i;
+procedure myproc(float arg1 float arg2)
+  int i
 begin
-  if i > 5:
+  if i > 5 then
     print(8)
-  elif i > 3:
+  elif i > 3 then
     print(1257)
-  else:
+  else
     print(65)
-  end;
-
-  while !1:
+  end
+  while !1 do
     print(1234 / 2)
-  ;
-
-  print(123 + 456);
-
-  for int i in 5:
+  end
+  print(123 + 456)
+  for int i in 5 do
     print(i)
-  ;
-  print(2.9);
-  nop;
+  end
+  print(2.9)
+  nop
   print(6)
 end
 
