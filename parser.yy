@@ -16,7 +16,7 @@
 %token<std::string> ID
 %token<int> INTVAL
 %token<double> FLOATVAL
-%token INT FLOAT
+%token<int> INT FLOAT
 %token PLUS MINUS MUL DIV
 %token LT LE GT GE EQ NE NOT
 %token COMMA ASMT COLON
@@ -35,6 +35,8 @@
 %left PLUS MINUS
 %left LT LE GT GE EQ NE IN
 
+%type <std::string> identifier_list
+
 %parse-param { Driver* driver }
 
 %code requires {
@@ -43,11 +45,33 @@
 }
 
 %{
+#define __DEBUG__
+#ifdef __DEBUG__
+#include <iostream>
+#endif
+#include <unordered_map>
 #include "lexer.hh"
 #undef yylex
 #define yylex driver->m_lexer->lex
 using Parser = yy::Parser;
 #define YYDEBUG 1
+
+class variable{
+int type;
+//type = token::INT or type = token::FLOAT;
+int ival;
+float fval;
+
+public:
+};
+
+class varMap{
+    std::unordered_map<std::string, variable> visible;
+
+public:
+    bool available(std::string name);
+};
+
 %}
 
 %%
@@ -58,8 +82,8 @@ declaration_list: declaration declaration_list
 
 declaration: type identifier_list
 
-identifier_list: ID
-               | ID COMMA identifier_list
+identifier_list: ID {$$ = $1; std::cout << $1;}
+               | ID COMMA identifier_list {$$ = $1; std::cout << $1;}
 
 type: standard_type
     | standard_type OSB INTVAL CSB
