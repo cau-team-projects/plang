@@ -13,6 +13,9 @@ lexer.yy.cc: lexer.ll
 parser.tab.cc: parser.yy
 	bison ${BFLAGS} $^
 
-.PHONY: clean
+.PHONY: clean, run
 clean:
 	rm -rf *.o *.yy.cc *.tab.hh *.tab.cc *.out location.hh
+
+run:
+	./plang test/good/t1.plang
