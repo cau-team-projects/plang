@@ -48,7 +48,6 @@ union varValue{
 using Type        = std::pair<int, int>;
 using Variable    = std::pair<Type, varValue*>;    //type, length(if array, else 0), list of value
 using VariableMap = std::unordered_map<std::string, Variable>; //name, variable
-
 }
 
 %{
@@ -80,6 +79,13 @@ std::vector<std::string> id_list;
 VariableMap vmap;
 std::vector<VariableMap> vstack;
 
+bool varValid(std::string name){
+    for(auto i = vstack.rbegin();i != vstack.rend();i++){
+        if(i->find(name) != i->end())
+		    return true;
+    }
+	return false;
+}
 %}
 
 %type<int> standard_type                   "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
@@ -88,30 +94,29 @@ std::vector<VariableMap> vstack;
 %%
 program: program_head subprogram_declaration_list compound_statement FIN {std::cout << vstack; vstack.pop_back(); return 0; }
 
-program_head: MAIN ID declaration_list { vstack.push_back(vmap); vmap.clear();}
+program_head: MAIN ID declaration_list                 { vstack.push_back(vmap); vmap.clear();}
 
-declaration_list: declaration declaration_list
-                | %empty
+declaration_list: declaration declaration_list         {}
+                | %empty                               {}
 
-declaration: type identifier_list {for(auto& i : id_list) { vmap.insert(std::pair<std::string, Variable>(i, Variable($1, NULL))); } id_list.clear();}
+declaration: type identifier_list                      {for(auto& i : id_list){ vmap.insert(std::pair<std::string, Variable>(i, Variable($1, NULL))); } id_list.clear();}
 
-identifier_list: ID {id_list.push_back($1);}
-               | ID COMMA identifier_list{id_list.push_back($1);}
+identifier_list: ID                                    {id_list.push_back($1);}
+               | ID COMMA identifier_list              {id_list.push_back($1);}
 
-type: standard_type {$$ = std::pair<int, int>($1, 0);}
-    | standard_type OSB INTVAL CSB{$$ = std::pair<int, int>($1, $3);}
+type: standard_type                                    {$$ = std::pair<int, int>($1, 0);}
+    | standard_type OSB INTVAL CSB                     {$$ = std::pair<int, int>($1, $3);}
 
-standard_type: INT {$$ = token::INT;}
-             | FLOAT {$$ = token::FLOAT;}
+standard_type: INT                                     {$$ = token::INT;}
+             | FLOAT                                   {$$ = token::FLOAT;}
 
-subprogram_declaration_list: subprogram_declarations
-subprogram_declarations: subprogram_declaration subprogram_declarations
-                       | %empty
+subprogram_declaration_list: subprogram_declaration subprogram_declaration_list {}
+                           | %empty                                             {}
 
-subprogram_declaration: subprogram_head declaration_list compound_statement
+subprogram_declaration: subprogram_head declaration_list compound_statement     {}
 
-subprogram_head: FUNC ID arguments COLON standard_type
-               | PROC ID arguments
+subprogram_head: FUNC ID arguments COLON standard_type {}
+               | PROC ID arguments                     {}
 
 arguments: OP declaration_list CP
          | %empty
@@ -146,7 +151,7 @@ for_statement: FOR type ID IN expression DO statement END
 print_statement: PRINT
                | PRINT OP expression CP
 
-variable: ID
+variable: ID{if(!varValid($1)) std::cout << $1 << " is not valid in this scope." << std::endl;}
         | ID OSB expression CSB
 
 procedure_statement: ID OP actual_parameter_expression CP
