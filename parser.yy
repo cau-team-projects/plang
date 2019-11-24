@@ -12,67 +12,56 @@
 }
 
 %start program
-%token FIN
-%token<std::string> ID
-%token<int> INTVAL
-%token<double> FLOATVAL
-%token<int> INT FLOAT
-%token PLUS MINUS MUL DIV
-%token LT LE GT GE EQ NE NOT
-%token COMMA ASMT COLON
-%token OP CP
-%token OSB CSB
-%token MAIN FUNC PROC
-%token BEG END
-%token IF ELIF ELSE THEN
-%token NOP
-%token WHILE DO
-%token RETURN
-%token PRINT
-%token FOR IN
-%token SEMI DOT
+%token FIN                                            "EOF"
+%token<std::string> ID                                "name of variable"
+%token<int> INTVAL                                    "int value"
+%token<double> FLOATVAL                               "float value"
+%token<int> INT FLOAT                                 "int, float"
+%token PLUS MINUS MUL DIV                             "+, -, *, /"
+%token LT LE GT GE EQ NE NOT                          "< <= > >= == != !"
+%token COMMA ASMT COLON                               ", = :"
+%token OP CP                                          "(   )"
+%token OSB CSB                                        "[   ]"
+%token MAIN FUNC PROC                                 "mainprog function procedure"
+%token BEG END                                        "begin end"
+%token IF ELIF ELSE THEN                              "if elif else then"
+%token NOP                                            "nop--- no execution"
+%token WHILE DO                                       "while do"
+%token RETURN                                         "return"
+%token PRINT                                          "print"
+%token FOR IN                                         "for in"
+%token SEMI DOT                                       "; ."
 %left MUL DIV
 %left PLUS MINUS
 %left LT LE GT GE EQ NE IN
-
-%type <std::string> identifier_list
 
 %parse-param { Driver* driver }
 
 %code requires {
 #include <memory>
+#include <tuple>
+#include <unordered_map>
 #include "driver.hh"
+using varValue    = union{int ival; float fval;};
+using Variable    = std::tuple<int, int, varValue>;                 //type, length(if array, else 0), list of value of variable
+using VariableMap = std::unordered_map<std::string, Variable>;      //name, variable
 }
 
 %{
-#define __DEBUG__
-#ifdef __DEBUG__
 #include <iostream>
-#endif
-#include <unordered_map>
 #include "lexer.hh"
 #undef yylex
 #define yylex driver->m_lexer->lex
 using Parser = yy::Parser;
 #define YYDEBUG 1
 
-class variable{
-int type;
-//type = token::INT or type = token::FLOAT;
-int ival;
-float fval;
-
-public:
-};
-
-class varMap{
-    std::unordered_map<std::string, variable> visible;
-
-public:
-    bool available(std::string name);
-};
-
+int data = 0;
+int func = 0;
+std::vector<std::string> id_list;
 %}
+
+%type<int> standard_type                              "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
+%type<std::pair<int, int>> type                       "<type, length>"
 
 %%
 program: MAIN ID declaration_list subprogram_declaration_list compound_statement FIN { return 0; }
@@ -80,29 +69,29 @@ program: MAIN ID declaration_list subprogram_declaration_list compound_statement
 declaration_list: declaration declaration_list
                 | %empty
 
-declaration: type identifier_list
+declaration: type identifier_list {std::cout << $1.first << "[" <<$1.second << "] :" << id_list.size() <<std::endl; id_list.clear();}
 
-identifier_list: ID {$$ = $1; std::cout << $1;}
-               | ID COMMA identifier_list {$$ = $1; std::cout << $1;}
+identifier_list: ID {id_list.push_back($1);}
+               | ID COMMA identifier_list{id_list.push_back($1);}
 
-type: standard_type
-    | standard_type OSB INTVAL CSB
+type: standard_type {$$ = std::pair<int, int>($1, 0);}
+    | standard_type OSB INTVAL CSB{$$ = std::pair<int, int>($1, $3);}
 
-standard_type: INT
-             | FLOAT
+standard_type: INT {$$ = token::INT;}
+             | FLOAT {$$ = token::FLOAT;}
 
 subprogram_declaration_list: subprogram_declaration subprogram_declaration_list
-                       | %empty
+                           | %empty
 
-subprogram_declaration: subprogram_head declaration_list compound_statement
+subprogram_declaration: subprogram_head declaration_list compound_statement {std::cout << "data=" << data << std::endl; func = 0;}
 
-subprogram_head: FUNC ID arguments COLON standard_type
+subprogram_head: FUNC ID arguments COLON standard_type{func = 5;}
                | PROC ID arguments
 
 arguments: OP declaration_list CP
          | %empty
 
-compound_statement: BEG statement_list END
+compound_statement: BEG statement_list END{std::cout << "func=" << func << std::endl;}
 
 statement_list: statement
               | statement statement_list
