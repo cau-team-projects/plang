@@ -39,12 +39,16 @@
 
 %code requires {
 #include <memory>
-#include <tuple>
 #include <unordered_map>
+#include <stack>
 #include "driver.hh"
-using varValue    = union{int ival; float fval;};
-using Variable    = std::tuple<int, int, varValue>;                 //type, length(if array, else 0), list of value of variable
-using VariableMap = std::unordered_map<std::string, Variable>;      //name, variable
+union varValue{
+    int ivalue;
+    double dvalue;
+};
+using Type        = std::pair<int, int>;
+using Variable    = std::pair<Type, varValue*>;    //type, length(if array, else 0), list of value
+using VariableMap = std::unordered_map<std::string, Variable>; //name, variable
 }
 
 %{
@@ -58,18 +62,21 @@ using Parser = yy::Parser;
 int data = 0;
 int func = 0;
 std::vector<std::string> id_list;
+VariableMap vmap;
+std::stack<VariableMap> vstack;
 %}
 
-%type<int> standard_type                              "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
-%type<std::pair<int, int>> type                       "<type, length>"
+%type<int> standard_type                   "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
+%type<Type> type
 
 %%
-program: MAIN ID declaration_list subprogram_declaration_list compound_statement FIN { return 0; }
+program: MAIN ID declaration_list subprogram_declaration_list compound_statement FIN {std::cout << "vmap size == " <<vmap.size() << std::endl; vmap.clear(); vstack.pop(); vstack.pop(); return 0; }
 
-declaration_list: declaration declaration_list
-                | %empty
+declaration_list: declarations {vstack.push(vmap);}
+declarations: declaration declarations
+            | %empty
 
-declaration: type identifier_list {std::cout << $1.first << "[" <<$1.second << "] :" << id_list.size() <<std::endl; id_list.clear();}
+declaration: type identifier_list {for(auto& i : id_list) { vmap.insert(std::pair<std::string, Variable>(i, Variable($1, NULL))); } id_list.clear();}
 
 identifier_list: ID {id_list.push_back($1);}
                | ID COMMA identifier_list{id_list.push_back($1);}
@@ -80,12 +87,13 @@ type: standard_type {$$ = std::pair<int, int>($1, 0);}
 standard_type: INT {$$ = token::INT;}
              | FLOAT {$$ = token::FLOAT;}
 
-subprogram_declaration_list: subprogram_declaration subprogram_declaration_list
-                           | %empty
+subprogram_declaration_list: subprogram_declarations
+subprogram_declarations: subprogram_declaration subprogram_declarations
+                       | %empty
 
 subprogram_declaration: subprogram_head declaration_list compound_statement {std::cout << "data=" << data << std::endl; func = 0;}
 
-subprogram_head: FUNC ID arguments COLON standard_type{func = 5;}
+subprogram_head: FUNC ID arguments COLON standard_type {func = 5;}
                | PROC ID arguments
 
 arguments: OP declaration_list CP
