@@ -113,12 +113,12 @@ standard_type: INT                                     {$$ = token::INT;}
 subprogram_declaration_list: subprogram_declaration subprogram_declaration_list {}
                            | %empty                                             {}
 
-subprogram_declaration: subprogram_head declaration_list compound_statement     {}
+subprogram_declaration: subprogram_head compound_statement     {vstack.pop_back(); vstack.pop_back();}
 
-subprogram_head: FUNC ID arguments COLON standard_type {}
-               | PROC ID arguments                     {}
+subprogram_head: FUNC ID arguments COLON standard_type declaration_list{vstack.push_back(vmap); vmap.clear();}
+               | PROC ID arguments declaration_list                    {vstack.push_back(vmap); vmap.clear();}
 
-arguments: OP declaration_list CP
+arguments: OP declaration_list CP {vstack.push_back(vmap); vmap.clear();}
          | %empty
 
 compound_statement: BEG statement_list END
