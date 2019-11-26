@@ -1,5 +1,6 @@
 CXXFLAGS += -g -pg
 CXXFLAGS += -fsanitize=address,leak,undefined
+CXXFLAGS += -std=c++17
 BFLAGS += -v
 
 all: plang

@@ -63,15 +63,15 @@ std::ostream& operator<<(std::ostream& os, const VariableMap& vmap){
     for(auto &i : vmap){
         os << "    " << i.first << ": " << i.second.first.first << "[" << i.second.first.second << "]" << std::endl;
     }
-	return os;
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack){
-	os << "vstack:" << std::endl;
-	for(auto &i : vstack){
-		os << "  " << i << std::endl;
-	}
-	return os;
+    os << "vstack:" << std::endl;
+    for(auto &i : vstack){
+        os << "  " << i << std::endl;
+    }
+    return os;
 }
 int data = 0;
 int func = 0;
@@ -79,27 +79,34 @@ std::vector<std::string> id_list;
 VariableMap vmap;
 std::vector<VariableMap> vstack;
 
-bool varValid(std::string name){
-    for(auto i = vstack.rbegin();i != vstack.rend();i++){
-        if(i->find(name) != i->end())
-		    return true;
-    }
-	return false;
+bool varValid(std::string name) {
+    return (vstack.empty() || vstack.back().find(name) != vstack.back().end());
 }
 %}
 
-%type<int> standard_type                   "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
+%type<int> standard_type "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
 %type<Type> type
 
 %%
-program: program_head subprogram_declaration_list compound_statement FIN {std::cout << vstack; vstack.pop_back(); return 0; }
+program: program_head subprogram_declaration_list compound_statement FIN {
+    std::cout << vstack;
+    //vstack.pop_back();
+    return 0;
+}
 
-program_head: MAIN ID declaration_list                 { vstack.push_back(vmap); vmap.clear();}
+program_head: MAIN ID declaration_list {
+    vstack.push_back(vmap);
+    vmap.clear();
+}
 
-declaration_list: declaration declaration_list         {}
-                | %empty                               {}
+declaration_list: declaration declaration_list | %empty
 
-declaration: type identifier_list                      {for(auto& i : id_list){ vmap.insert(std::pair<std::string, Variable>(i, Variable($1, NULL))); } id_list.clear();}
+declaration: type identifier_list {
+    for(auto& i : id_list) {
+        vmap.insert(std::pair<std::string, Variable>(i, Variable($1, nullptr)));
+    }
+    id_list.clear();
+}
 
 identifier_list: ID                                    {id_list.push_back($1);}
                | ID COMMA identifier_list              {id_list.push_back($1);}
@@ -110,16 +117,26 @@ type: standard_type                                    {$$ = std::pair<int, int>
 standard_type: INT                                     {$$ = token::INT;}
              | FLOAT                                   {$$ = token::FLOAT;}
 
-subprogram_declaration_list: subprogram_declaration subprogram_declaration_list {}
-                           | %empty                                             {}
+subprogram_declaration_list: subprogram_declaration subprogram_declaration_list
+                           | %empty
 
-subprogram_declaration: subprogram_head compound_statement     {vstack.pop_back(); vstack.pop_back();}
+subprogram_declaration: subprogram_head compound_statement {
+    std::cout << vstack;
+    //vstack.pop_back();
+    //vstack.pop_back();
+}
 
-subprogram_head: FUNC ID arguments COLON standard_type declaration_list{vstack.push_back(vmap); vmap.clear();}
-               | PROC ID arguments declaration_list                    {vstack.push_back(vmap); vmap.clear();}
+subprogram_head: FUNC ID arguments COLON standard_type declaration_list {
+    vstack.push_back(vmap);
+    vmap.clear();
+} | PROC ID arguments declaration_list {
+    vstack.push_back(vmap);
+    vmap.clear();
+}
 
-arguments: OP declaration_list CP {vstack.push_back(vmap); vmap.clear();}
-         | %empty
+arguments: OP declaration_list CP {
+    vstack.push_back(vmap); vmap.clear();
+} | %empty
 
 compound_statement: BEG statement_list END
 
@@ -151,8 +168,13 @@ for_statement: FOR type ID IN expression DO statement END
 print_statement: PRINT
                | PRINT OP expression CP
 
-variable: ID{if(!varValid($1)) std::cout << $1 << " is not valid in this scope." << std::endl;}
-        | ID OSB expression CSB
+variable:
+    ID {
+        if(!varValid($1)) {
+            std::cerr << $1 << " is not valid in this scope." << std::endl;
+            return -1;
+        }
+    } | ID OSB expression CSB
 
 procedure_statement: ID OP actual_parameter_expression CP
 

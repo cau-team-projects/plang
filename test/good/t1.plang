@@ -35,5 +35,5 @@ begin
 end
 
 begin
-  print(here_is_compound_statement)
+  print(1234)
 end
