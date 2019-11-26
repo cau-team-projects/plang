@@ -39,49 +39,18 @@
 
 %code requires {
 #include <memory>
-#include <unordered_map>
 #include "driver.hh"
-union varValue{
-    int ivalue;
-    double dvalue;
-};
-using Type        = std::pair<int, int>;
-using Variable    = std::pair<Type, varValue*>;    //type, length(if array, else 0), list of value
-using VariableMap = std::unordered_map<std::string, Variable>; //name, variable
 }
 
 %{
 #include <iostream>
 #include "lexer.hh"
+#include "driver.hh"
 #undef yylex
 #define yylex driver->m_lexer->lex
 using Parser = yy::Parser;
 #define YYDEBUG 1
 
-std::ostream& operator<<(std::ostream& os, const VariableMap& vmap){
-    os << "vmap:" << std::endl;
-    for(auto &i : vmap){
-        os << "    " << i.first << ": " << i.second.first.first << "[" << i.second.first.second << "]" << std::endl;
-    }
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack){
-    os << "vstack:" << std::endl;
-    for(auto &i : vstack){
-        os << "  " << i << std::endl;
-    }
-    return os;
-}
-int data = 0;
-int func = 0;
-std::vector<std::string> id_list;
-VariableMap vmap;
-std::vector<VariableMap> vstack;
-
-bool varValid(std::string name) {
-    return (vstack.empty() || vstack.back().find(name) != vstack.back().end());
-}
 %}
 
 %type<int> standard_type "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
@@ -89,27 +58,26 @@ bool varValid(std::string name) {
 
 %%
 program: program_head subprogram_declaration_list compound_statement FIN {
-    std::cout << vstack;
+    std::cout << driver->vstack << std::endl;
     //vstack.pop_back();
     return 0;
 }
-
 program_head: MAIN ID declaration_list {
-    vstack.push_back(vmap);
-    vmap.clear();
+    driver->vstack.push_back(driver->vmap);
+    driver->vmap.clear();
 }
 
 declaration_list: declaration declaration_list | %empty
 
 declaration: type identifier_list {
-    for(auto& i : id_list) {
-        vmap.insert(std::pair<std::string, Variable>(i, Variable($1, nullptr)));
+    for(auto& i : driver->id_list) {
+        driver->vmap.insert(std::pair<std::string, Variable>(i, Variable($1, nullptr)));
     }
-    id_list.clear();
+    driver->id_list.clear();
 }
 
-identifier_list: ID                                    {id_list.push_back($1);}
-               | ID COMMA identifier_list              {id_list.push_back($1);}
+identifier_list: ID                                    {driver->id_list.push_back($1);}
+               | ID COMMA identifier_list              {driver->id_list.push_back($1);}
 
 type: standard_type                                    {$$ = std::pair<int, int>($1, 0);}
     | standard_type OSB INTVAL CSB                     {$$ = std::pair<int, int>($1, $3);}
@@ -121,21 +89,21 @@ subprogram_declaration_list: subprogram_declaration subprogram_declaration_list
                            | %empty
 
 subprogram_declaration: subprogram_head compound_statement {
-    std::cout << vstack;
     //vstack.pop_back();
     //vstack.pop_back();
 }
 
 subprogram_head: FUNC ID arguments COLON standard_type declaration_list {
-    vstack.push_back(vmap);
-    vmap.clear();
+    driver->vstack.push_back(driver->vmap);
+    driver->vmap.clear();
 } | PROC ID arguments declaration_list {
-    vstack.push_back(vmap);
-    vmap.clear();
+    driver->vstack.push_back(driver->vmap);
+    driver->vmap.clear();
 }
 
 arguments: OP declaration_list CP {
-    vstack.push_back(vmap); vmap.clear();
+    driver->vstack.push_back(driver->vmap);
+    driver->vmap.clear();
 } | %empty
 
 compound_statement: BEG statement_list END
@@ -170,7 +138,7 @@ print_statement: PRINT
 
 variable:
     ID {
-        if(!varValid($1)) {
+        if(!driver->varValid($1)) {
             std::cerr << $1 << " is not valid in this scope." << std::endl;
             return -1;
         }
@@ -217,7 +185,6 @@ addop: PLUS
 mulop: MUL
      | DIV
 %%
-
 void Parser::error(const Parser::location_type& loc, const std::string& msg) {
     driver->error(loc, msg);
 }

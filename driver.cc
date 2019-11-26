@@ -32,3 +32,23 @@ bool Driver::parse() {
 void Driver::error(const Parser::location_type& loc, const std::string& msg) {
     std::cerr << loc << ": " << msg << std::endl;
 }
+
+bool Driver::varValid(std::string name) {
+    return (vstack.empty() || vstack.back().find(name) != vstack.back().end());
+}
+
+std::ostream& operator<<(std::ostream& os, const VariableMap& vmap) {
+    os << "vmap:" << std::endl;
+    for(auto &i : vmap){
+        os << "    " << i.first << ": " << i.second.first.first << "[" << i.second.first.second << "]" << std::endl;
+    }
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack) {
+	os << "vstack:" << std::endl;
+	for(auto &i : vstack){
+		os << "  " << i << std::endl;
+	}
+	return os;
+}
