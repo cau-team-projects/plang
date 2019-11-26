@@ -59,7 +59,6 @@ using Parser = yy::Parser;
 %%
 program: program_head subprogram_declaration_list compound_statement FIN {
     std::cout << driver->vstack << std::endl;
-    //vstack.pop_back();
     return 0;
 }
 program_head: MAIN ID declaration_list {
@@ -89,8 +88,8 @@ subprogram_declaration_list: subprogram_declaration subprogram_declaration_list
                            | %empty
 
 subprogram_declaration: subprogram_head compound_statement {
-    //vstack.pop_back();
-    //vstack.pop_back();
+    driver->vstack.pop_back();
+    driver->vstack.pop_back();
 }
 
 subprogram_head: FUNC ID arguments COLON standard_type declaration_list {
