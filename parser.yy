@@ -39,15 +39,7 @@
 
 %code requires {
 #include <memory>
-#include <unordered_map>
 #include "driver.hh"
-union varValue{
-    int ivalue;
-    double dvalue;
-};
-using Type        = std::pair<int, int>;
-using Variable    = std::pair<Type, varValue*>;    //type, length(if array, else 0), list of value
-using VariableMap = std::unordered_map<std::string, Variable>; //name, variable
 }
 
 %{
@@ -58,41 +50,17 @@ using VariableMap = std::unordered_map<std::string, Variable>; //name, variable
 using Parser = yy::Parser;
 #define YYDEBUG 1
 
-std::ostream& operator<<(std::ostream& os, const VariableMap& vmap){
-    os << "vmap:" << std::endl;
-    for(auto &i : vmap){
-        os << "    " << i.first << ": " << i.second.first.first << "[" << i.second.first.second << "]" << std::endl;
-    }
-	return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack){
-	os << "vstack:" << std::endl;
-	for(auto &i : vstack){
-		os << "  " << i << std::endl;
-	}
-	return os;
-}
-int data = 0;
-int func = 0;
 std::vector<std::string> id_list;
 VariableMap vmap;
 std::vector<VariableMap> vstack;
 
-bool varValid(std::string name){
-    for(auto i = vstack.rbegin();i != vstack.rend();i++){
-        if(i->find(name) != i->end())
-		    return true;
-    }
-	return false;
-}
 %}
 
 %type<int> standard_type                   "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
 %type<Type> type
 
 %%
-program: program_head subprogram_declaration_list compound_statement FIN {std::cout << vstack; vstack.pop_back(); return 0; }
+program: program_head subprogram_declaration_list compound_statement FIN {vstack.pop_back(); return 0; }
 
 program_head: MAIN ID declaration_list                 { vstack.push_back(vmap); vmap.clear();}
 
@@ -151,7 +119,7 @@ for_statement: FOR type ID IN expression DO statement END
 print_statement: PRINT
                | PRINT OP expression CP
 
-variable: ID{if(!varValid($1)) std::cout << $1 << " is not valid in this scope." << std::endl;}
+variable: ID{if(!varValid(vstack, $1)) std::cout << $1 << " is not valid in this scope." << std::endl;}
         | ID OSB expression CSB
 
 procedure_statement: ID OP actual_parameter_expression CP

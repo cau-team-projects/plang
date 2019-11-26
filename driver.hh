@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <vector>
+#include <unordered_map>
 #include "location.hh"
 
 class Lexer;
@@ -30,4 +32,16 @@ public:
     bool parse();
 };
 
+
+union varValue{
+    int ivalue;
+    double dvalue;
+};
+
+using Type        = std::pair<int, int>;
+using Variable    = std::pair<Type, varValue*>;    //type, length(if array, else 0), list of value
+using VariableMap = std::unordered_map<std::string, Variable>; //name, variable
+std::ostream& operator<<(std::ostream& os, const VariableMap& vmap);
+std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack);
+bool varValid(std::vector<VariableMap>& vstack, std::string name);
 #endif
