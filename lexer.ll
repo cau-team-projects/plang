@@ -99,6 +99,9 @@ using Token = Parser::token;
     }
 }
 
+"//"(.*)"\n" {
+    //do nothing
+}
 . {
     std::cerr << "Invalid Token" << yytext << std::endl;
     yyterminate();
