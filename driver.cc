@@ -37,6 +37,44 @@ bool Driver::varValid(std::string name) {
     return (vstack.empty() || vstack.back().find(name) != vstack.back().end());
 }
 
+
+VarValue::VarValue(){ value.dval = 0;}
+VarValue::VarValue(int i) {value.ival = i;}
+VarValue::VarValue(double d){value.dval = d;}
+
+
+
+RValue::RValue(int type, VarValue val){
+    this->type = type;
+    this->val = val;
+}
+RValue::~RValue(){}
+
+RValue operator+(RValue& me, RValue& other){
+    RValue ret = me;
+    return me;
+}
+
+RValue operator-(RValue& me, RValue& other){
+    RValue ret = me;
+    return me;
+}
+
+RValue operator*(RValue& me, RValue& other){
+    RValue ret = me;
+    return me;
+}
+
+RValue operator/(RValue& me, RValue& other){
+    RValue ret = me;
+    return me;
+}
+
+
+
+
+
+
 std::ostream& operator<<(std::ostream& os, const VariableMap& vmap) {
     os << "vmap:" << std::endl;
     for(auto &i : vmap){

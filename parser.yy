@@ -55,6 +55,7 @@ using Parser = yy::Parser;
 
 %type<int> standard_type "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
 %type<Type> type
+%type<int> addop mulop
 
 %%
 program: program_head subprogram_declaration_list compound_statement FIN {
@@ -141,7 +142,13 @@ variable:
             std::cerr << $1 << " is not valid in this scope." << std::endl;
             return -1;
         }
-    } | ID OSB expression CSB
+
+    } | ID OSB expression CSB{
+        if(!driver->varValid($1)) {
+            std::cerr << $1 << " is not valid in this scope." << std::endl;
+            return -1;
+        }
+    }
 
 procedure_statement: ID OP actual_parameter_expression CP
 
@@ -178,11 +185,11 @@ relop: GT
      | NE
      | IN
 
-addop: PLUS
-     | MINUS
+addop: PLUS {$$ = token::PLUS;}
+     | MINUS {$$ = token::MINUS;}
 
-mulop: MUL
-     | DIV
+mulop: MUL {$$ = token::MUL;}
+     | DIV {$$ = token::DIV;}
 %%
 void Parser::error(const Parser::location_type& loc, const std::string& msg) {
     driver->error(loc, msg);

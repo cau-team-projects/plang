@@ -14,9 +14,31 @@ namespace yy {
     class Parser;
 };
 
-union VarValue{
-    int ivalue;
-    double dvalue;
+class VarValue{ //언어 내에서 지원되는 모든 최소단위 데이터들의 집합
+private:
+union{
+    int ival;
+    double dval;
+} value;
+public:
+    VarValue();
+    VarValue(int i);
+    VarValue(double d);
+};
+
+class RValue{ //우측 값으로 올 수 있는 것들. int, float에 상관 없이 사칙연산이 가능하게 함.
+              //연산 후의 타입은 (int, int)->int, (float가 하나라도 있으면)->float
+              //만약 비교 연산자 RV > RV가 올 경우 int(1), int(0)으로 바꾸어서 쓸 것(아마 안 쓰일 듯)
+    int type;
+    VarValue val;
+
+public:
+    RValue(int type, VarValue val);
+    ~RValue();
+    friend RValue operator+(RValue& me, RValue& other);
+    friend RValue operator-(RValue& me, RValue& other);
+    friend RValue operator*(RValue& me, RValue& other);
+    friend RValue operator/(RValue& me, RValue& other);
 };
 
 using Parser = yy::Parser;
