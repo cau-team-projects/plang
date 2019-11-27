@@ -1,0 +1,39 @@
+mainprog myprog
+
+int var1
+float var2
+int[-17] arr1                           //invalid case: arr1 want to allocate negative amount of memory
+
+function myfunc(int arg1): int
+  int[10] var1
+begin
+  var1[4 + 2 * 5] = 3 * 6               //invalid case: var1's max is 10, but this operation want to change 15th value
+  print(1.1)
+  return 13
+end
+
+procedure myproc(float arg1 float arg2)
+  int i
+begin
+  if i > 5 then
+    print(8)
+  elif i > 3 then
+    print(1257)
+  else
+    print(65)
+  end
+  while !1 do
+    print(1234 / 0)                     //invalid case: there's a illegal trial that divide some value by '0'
+  end
+  print(123 + 456)
+  for int i in 3.7 do                   //invalid case: 'for'structure try to run "3.7"times(non-integer times)
+    print(-i)
+  end
+  print(2.9)
+  nop
+  print(6)
+end
+
+begin
+  print(1234)
+end
