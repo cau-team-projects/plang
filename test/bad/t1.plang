@@ -1,27 +1,39 @@
-mainprog pltestdata01;
+mainprog myprog
 
-int variable1,int [5] variable2ary,float variable3;
+int var1
+float var2
+int[10] arr1
 
-function testcodefunc
-(funcparameter:int):int;
-int variableinfunc;
+function myfunc(arg1): int                  //no argument's data type
+  int[10] var1
 begin
-firstIntVar [ 4 +2 * 2 ] = 3 * 6;
-print ( fNum {3.7} )
+  var1[4 + 2 * 2] = 3 * 6
+  print(1.1)
+  return                                    //no return value
 end
 
-procedure 01testcodeprocedure
-(procedureparameter1:float;procedureparameter2:float;);
-new begin
-firstFloatVar ( 1.1 * 0.7;0.3 /0.6<2.1 +2.9 );
-if 1 +7 / +2>3  :print (8)
-(elif 1 : print (1257))
-[else : 5>7-6];
-while !1 : print (1234 / 2) [else : 123 +456];
-for 7 in 5 : print (7.8) [else :print (2.9)];
-return 5 -3;
-nop
-print (6)
+procedure myproc(arg1 arg2)                 //no argument's data type
+  int i
+begin
+  if i > 5 then
+    print(8)
+  elif i > 3 then
+    print(1257)
+  else
+    print(65)
+  end
+  while !1 do
+    print(1234 / 2)
+  end
+  print(123 + 456)
+  for int i in 5 do
+    print(-i)
+  end
+  print(2.9)
+  nop
+  print(6)
 end
 
-//bad case with illegal factors
+begin
+  print(1234)
+end
