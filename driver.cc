@@ -55,29 +55,109 @@ RValue::RValue(int type, VarValue val){
 }
 RValue::~RValue(){}
 
-int RValue::getType() const{ return type;}
+int RValue::getType() const{ return type; }
 
-VarValue RValue::getValue() const{ return value;}
+VarValue RValue::getValue() const{ return value; }
 
+int RValue::getInt() const { return value.getInt(); }
+
+double RValue::getFloat() const { return value.getFloat(); }
 
 RValue operator+(RValue& me, RValue& other){
-    RValue ret = me;
-    return me;
+    int type = Parser::token::FLOAT;
+    VarValue v;
+    if(me.getType() == Parser::token::INT){
+        if(other.getType() == Parser::token::INT){
+            v.setInt(me.getInt() + other.getInt());
+            type = Parser::token::INT;
+        }
+        else{
+            v.setFloat((double)me.getInt() + other.getFloat());
+        }
+    }
+    else{
+        if(other.getType() == Parser::token::INT){
+            v.setFloat(me.getFloat() + (double)other.getInt());
+        }
+        else{
+            v.setFloat(me.getFloat() + other.getFloat());
+        }
+    }
+    return RValue(type, v);
 }
 
 RValue operator-(RValue& me, RValue& other){
-    RValue ret = me;
-    return me;
+    int type = Parser::token::FLOAT;
+    VarValue v;
+    if(me.getType() == Parser::token::INT){
+        if(other.getType() == Parser::token::INT){
+            v.setInt(me.getInt() - other.getInt());
+            type = Parser::token::INT;
+        }
+        else{
+            v.setFloat((double)me.getInt() - other.getFloat());
+        }
+    }
+    else{
+        if(other.getType() == Parser::token::INT){
+            v.setFloat(me.getFloat() - (double)other.getInt());
+        }
+        else{
+            v.setFloat(me.getFloat() - other.getFloat());
+        }
+    }
+    return RValue(type, v);
 }
 
 RValue operator*(RValue& me, RValue& other){
-    RValue ret = me;
-    return me;
+    int type = Parser::token::FLOAT;
+    VarValue v;
+    if(me.getType() == Parser::token::INT){
+        if(other.getType() == Parser::token::INT){
+            v.setInt(me.getInt() * other.getInt());
+            type = Parser::token::INT;
+        }
+        else{
+            v.setFloat((double)me.getInt() * other.getFloat());
+        }
+    }
+    else{
+        if(other.getType() == Parser::token::INT){
+            v.setFloat(me.getFloat() * (double)other.getInt());
+        }
+        else{
+            v.setFloat(me.getFloat() * other.getFloat());
+        }
+    }
+    return RValue(type, v);
 }
 
 RValue operator/(RValue& me, RValue& other){
-    RValue ret = me;
-    return me;
+    int type = Parser::token::FLOAT;
+    VarValue v;
+
+    if(other.getType() == Parser::token::INT && other.getInt() == 0 ||
+	   other.getType() == Parser::token::FLOAT && other.getFloat() == 0.0){
+	   std::cerr << "Divided by zero Error." << std::endl;
+	}
+    if(me.getType() == Parser::token::INT){
+        if(other.getType() == Parser::token::INT){
+            v.setInt(me.getInt() / other.getInt());
+            type = Parser::token::INT;
+        }
+        else{
+            v.setFloat((double)me.getInt() / other.getFloat());
+        }
+    }
+    else{
+        if(other.getType() == Parser::token::INT){
+            v.setFloat(me.getFloat() / (double)other.getInt());
+        }
+        else{
+            v.setFloat(me.getFloat() / other.getFloat());
+        }
+    }
+    return RValue(type, v);
 }
 
 
@@ -106,4 +186,3 @@ std::ostream& operator<<(std::ostream& os, const RValue& rval){
     else                                os << rval.value.getFloat();
     return os;
 }
-

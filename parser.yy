@@ -59,10 +59,7 @@ using Parser = yy::Parser;
 %type<RValue> expression simple_expression term factor
 
 %%
-program: program_head subprogram_declaration_list compound_statement FIN {
-    std::cout << driver->vstack << std::endl;
-    return 0;
-}
+program: program_head subprogram_declaration_list compound_statement FIN { driver->vstack.pop_back(); return 0; }
 program_head: MAIN ID declaration_list {
     driver->vstack.push_back(driver->vmap);
     driver->vmap.clear();
@@ -81,7 +78,12 @@ identifier_list: ID                                    {driver->id_list.push_bac
                | ID COMMA identifier_list              {driver->id_list.push_back($1);}
 
 type: standard_type                                    {$$ = std::pair<int, int>($1, 0);}
-    | standard_type OSB INTVAL CSB                     {$$ = std::pair<int, int>($1, $3);}
+    | standard_type OSB INTVAL CSB                     {$$ = std::pair<int, int>($1, $3);
+                                                        if($3 <= 0){
+                                                            std::cerr << "array with length " << $3 << " had been declared."<<std::endl;
+                                                            return -1;
+                                                            }
+                                                        }
 
 standard_type: INT                                     {$$ = token::INT;}
              | FLOAT                                   {$$ = token::FLOAT;}
@@ -139,14 +141,26 @@ print_statement: PRINT {/*std::cout << driver->vstack << std::endl;*/}
 
 variable:
     ID {
-        if(!driver->varValid($1)) {
+        Variable v;
+        if(!driver->varValid($1, &v)) {
             std::cerr << $1 << " is not valid in this scope." << std::endl;
             return -1;
         }
-
+        if(v.first.second != 0){
+            std::cerr << $1 << " is not a array type." << std::endl;
+        }
     } | ID OSB expression CSB{
-        if(!driver->varValid($1)) {
+        Variable v;
+        if(!driver->varValid($1, &v)) {
             std::cerr << $1 << " is not valid in this scope." << std::endl;
+            return -1;
+        }
+        if($3.getType() != token::INT){
+            std::cerr << "Invalid array access " << $1 << "[" << $3.getFloat() << "]" << std::endl;
+            return -1;
+        }
+        if($3.getInt() >= v.first.second || $3.getInt() < 0){
+            std::cerr << "Invalid array access " << $1 << "[" << $3.getFloat() << "]" << std::endl;
             return -1;
         }
     }
@@ -156,11 +170,11 @@ procedure_statement: ID OP actual_parameter_expression CP
 actual_parameter_expression: %empty
                            | expression_list
 
-expression_list: expression {std::cout << "expression:" <<$1 << std::endl;}
-               | expression COMMA expression_list {std::cout << "expression:" <<$1 << std::endl;}
+expression_list: expression
+               | expression COMMA expression_list
 
-expression: simple_expression {std::cout << "expression:" <<$1 << std::endl; $$ = $1;}
-          | simple_expression relop expression {std::cout << "expression:" <<$1 << std::endl; $$ = $1;}
+expression: simple_expression {$$ = $1;}
+          | simple_expression relop expression {$$ = $1;}
 
 simple_expression: term {$$ = $1;}
                  | term addop simple_expression {
