@@ -12,25 +12,31 @@
 }
 
 %start program
-%token FIN                                            "EOF"
-%token<std::string> ID                                "name of variable"
-%token<int> INTVAL                                    "int value"
-%token<double> FLOATVAL                               "float value"
-%token<int> INT FLOAT                                 "int, float"
-%token PLUS MINUS MUL DIV                             "+, -, *, /"
-%token LT LE GT GE EQ NE NOT                          "< <= > >= == != !"
-%token COMMA ASMT COLON                               ", = :"
-%token OP CP                                          "(   )"
-%token OSB CSB                                        "[   ]"
-%token MAIN FUNC PROC                                 "mainprog function procedure"
-%token BEG END                                        "begin end"
-%token IF ELIF ELSE THEN                              "if elif else then"
-%token NOP                                            "nop--- no execution"
-%token WHILE DO                                       "while do"
-%token RETURN                                         "return"
-%token PRINT                                          "print"
-%token FOR IN                                         "for in"
-%token SEMI DOT                                       "; ."
+%token FIN "EOF"
+%token<std::string> ID
+%token<int> INTVAL
+%token<double> FLOATVAL
+%token<int> INT FLOAT
+%token PLUS MINUS MUL DIV
+%token LT LE GT GE EQ NE NOT
+%token COMMA
+%token COLON
+%token ASMT "="
+%token OP "OPEN BRACKET"
+%token CP "CLOSE BRACKET"
+%token OSB "OPEN SPACE BRACKET"
+%token CSB "CLOSE SPACE BRACKET"
+%token MAIN FUNC PROC
+%token BEG "BEGIN"
+%token END "END"
+%token IF ELIF ELSE THEN
+%token NOP
+%token WHILE DO
+%token RETURN
+%token PRINT
+%token FOR IN
+%token SEMI "SEMICOLON"
+%token DOT
 %left MUL DIV
 %left PLUS MINUS
 %left LT LE GT GE EQ NE IN
