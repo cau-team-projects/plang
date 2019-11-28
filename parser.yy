@@ -168,7 +168,7 @@ variable:
             return -1;
         }
         if($3.getType() != token::INT){
-            std::cerr << "invalid case: Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
+            std::cerr << "invalid case: Invalid array access " << $1 << "[" << $3.getFloat() << "]" << std::endl;
             return -1;
         }
         if($3.getInt() >= v.first.second || $3.getInt() < 0){
