@@ -156,11 +156,11 @@ variable:
             return -1;
         }
         if($3.getType() != token::INT){
-            std::cerr << "Invalid array access " << $1 << "[" << $3.getFloat() << "]" << std::endl;
+            std::cerr << "Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
             return -1;
         }
         if($3.getInt() >= v.first.second || $3.getInt() < 0){
-            std::cerr << "Invalid array access " << $1 << "[" << $3.getFloat() << "]" << std::endl;
+            std::cerr << "Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
             return -1;
         }
     }
@@ -185,7 +185,12 @@ simple_expression: term {$$ = $1;}
 term: factor {$$ = $1;}
     | factor mulop term {
                          if($2 == token::MUL) {$$ = $1 * $3;}
-                         else                 {$$ = $1 / $3;}
+                         else                 {
+                                               if(($3.getType() == token::INT && $3.getInt() == 0) || ($3.getType() == token::FLOAT && $3.getFloat() == 0.0f)){
+                                                   std::cerr << "Divided by zero Error." << std::endl; return -1;
+                                               }
+                                               else {$$ = $1 / $3;}
+                                              }
                         }
 
 factor: INTVAL {$$ = RValue(token::INT, VarValue($1));}
