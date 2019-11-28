@@ -68,6 +68,12 @@ program_head: MAIN ID declaration_list {
 declaration_list: declaration declaration_list | %empty
 
 declaration: type identifier_list {
+    if($1.second < 0){
+        std::cerr << "invalid case: Array with length " << $1.second << "  ";
+        for(auto& i: driver->id_list) { std::cerr << i << " ";}
+        std::cerr << "had been declared." << std::endl;
+        return -1;
+    }
     for(auto& i : driver->id_list) {
         driver->vmap.insert(std::pair<std::string, Variable>(i, Variable($1, nullptr)));
     }
@@ -78,12 +84,7 @@ identifier_list: ID                                    {driver->id_list.push_bac
                | ID COMMA identifier_list              {driver->id_list.push_back($1);}
 
 type: standard_type                                    {$$ = std::pair<int, int>($1, 0);}
-    | standard_type OSB INTVAL CSB                     {$$ = std::pair<int, int>($1, $3);
-                                                        if($3 <= 0){
-                                                            std::cerr << "array with length " << $3 << " had been declared."<<std::endl;
-                                                            return -1;
-                                                            }
-                                                        }
+    | standard_type OSB INTVAL CSB                     {$$ = std::pair<int, int>($1, $3);}
 
 standard_type: INT                                     {$$ = token::INT;}
              | FLOAT                                   {$$ = token::FLOAT;}
@@ -134,7 +135,12 @@ elif: ELIF expression THEN statement
 
 while_statement: WHILE expression DO statement END
 
-for_statement: FOR type ID IN expression DO statement END
+for_statement: FOR type ID IN expression DO statement END {
+                   if($5.getType() == token::FLOAT) {
+                       std::cerr << "invalid case: 'for' structure try to run " << $5.getFloat() <<" times(non-integer times)" << std::endl;
+                       return -1;
+                   }
+               }
 
 print_statement: PRINT {/*std::cout << driver->vstack << std::endl;*/}
                | PRINT OP expression CP {/*std::cout << $3 << std::endl;*/}
@@ -143,24 +149,24 @@ variable:
     ID {
         Variable v;
         if(!driver->varValid($1, &v)) {
-            std::cerr << $1 << " is not valid in this scope." << std::endl;
+            std::cerr << "invalid case: " << $1 << " is not declared." << std::endl;
             return -1;
         }
         if(v.first.second != 0){
-            std::cerr << $1 << " is not a array type." << std::endl;
+            std::cerr << "invalid case: " << $1 << " is not a array type." << std::endl;
         }
     } | ID OSB expression CSB{
         Variable v;
         if(!driver->varValid($1, &v)) {
-            std::cerr << $1 << " is not valid in this scope." << std::endl;
+            std::cerr << "invalid case: " << $1 << " is not declared." << std::endl;
             return -1;
         }
         if($3.getType() != token::INT){
-            std::cerr << "Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
+            std::cerr << "invalid case: Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
             return -1;
         }
         if($3.getInt() >= v.first.second || $3.getInt() < 0){
-            std::cerr << "Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
+            std::cerr << "invalid case: Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
             return -1;
         }
     }
@@ -187,7 +193,7 @@ term: factor {$$ = $1;}
                          if($2 == token::MUL) {$$ = $1 * $3;}
                          else                 {
                                                if(($3.getType() == token::INT && $3.getInt() == 0) || ($3.getType() == token::FLOAT && $3.getFloat() == 0.0f)){
-                                                   std::cerr << "Divided by zero Error." << std::endl; return -1;
+                                                   std::cerr << "invalid case: Divided by zero Error." << std::endl; return -1;
                                                }
                                                else {$$ = $1 / $3;}
                                               }
