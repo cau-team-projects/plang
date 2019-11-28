@@ -84,7 +84,7 @@ using Token = Parser::token;
         yylval->emplace<int>(std::stoi(yytext));
         return Token::INTVAL;
     } catch(std::out_of_range& e) {
-        std::cerr << "INTVAL too large!" << std::endl;
+        std::cerr << "invalid case: INTVAL too large!" << std::endl;
         yyterminate();
     }
 }
@@ -94,7 +94,7 @@ using Token = Parser::token;
         yylval->emplace<double>(std::stod(yytext));
         return Token::FLOATVAL;
     } catch(std::out_of_range& e) {
-        std::cerr << "FLOATVAL too large!" << std::endl;
+        std::cerr << "invalid case: FLOATVAL too large!" << std::endl;
         yyterminate();
     }
 }
@@ -103,7 +103,7 @@ using Token = Parser::token;
     //do nothing
 }
 . {
-    std::cerr << "Invalid Token" << yytext << std::endl;
+    std::cerr << "invalid case: Invalid Token " << yytext << std::endl;
     yyterminate();
 }
 
