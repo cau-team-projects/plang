@@ -33,10 +33,15 @@ void Driver::error(const Parser::location_type& loc, const std::string& msg) {
     std::cerr << loc << ": " << msg << std::endl;
 }
 
-bool Driver::varValid(std::string name) {
-    return (vstack.empty() || vstack.back().find(name) != vstack.back().end());
+bool Driver::varValid(std::string name, Variable* v) {
+    for(auto i = vstack.rbegin();i != vstack.rend();i++){
+        if(i->find(name) != i->end()) {
+            if(v) *v = i->find(name)->second;
+            return true;
+        }
+    }
+    return false;
 }
-
 
 VarValue::VarValue(){ value.dval = 0;}
 VarValue::VarValue(int i) {value.ival = i;}
@@ -46,9 +51,14 @@ VarValue::VarValue(double d){value.dval = d;}
 
 RValue::RValue(int type, VarValue val){
     this->type = type;
-    this->val = val;
+    this->value = val;
 }
 RValue::~RValue(){}
+
+int RValue::getType() const{ return type;}
+
+VarValue RValue::getValue() const{ return value;}
+
 
 RValue operator+(RValue& me, RValue& other){
     RValue ret = me;
@@ -80,13 +90,20 @@ std::ostream& operator<<(std::ostream& os, const VariableMap& vmap) {
     for(auto &i : vmap){
         os << "    " << i.first << ": " << i.second.first.first << "[" << i.second.first.second << "]" << std::endl;
     }
-	return os;
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack) {
-	os << "vstack:" << std::endl;
-	for(auto &i : vstack){
-		os << "  " << i << std::endl;
-	}
-	return os;
+    os << "vstack:" << std::endl;
+    for(auto &i : vstack){
+        os << "  " << i << std::endl;
+    }
+    return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const RValue& rval){
+    if(rval.type == Parser::token::INT) os << rval.value.getInt();
+    else                                os << rval.value.getFloat();
+    return os;
+}
+

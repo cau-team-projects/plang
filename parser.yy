@@ -56,6 +56,7 @@ using Parser = yy::Parser;
 %type<int> standard_type "type in {INT, FLOAT}. uses token::INT, token::FLOAT itself."
 %type<Type> type
 %type<int> addop mulop
+%type<RValue> expression simple_expression term factor
 
 %%
 program: program_head subprogram_declaration_list compound_statement FIN {
@@ -133,8 +134,8 @@ while_statement: WHILE expression DO statement END
 
 for_statement: FOR type ID IN expression DO statement END
 
-print_statement: PRINT
-               | PRINT OP expression CP
+print_statement: PRINT {/*std::cout << driver->vstack << std::endl;*/}
+               | PRINT OP expression CP {/*std::cout << $3 << std::endl;*/}
 
 variable:
     ID {
@@ -155,24 +156,30 @@ procedure_statement: ID OP actual_parameter_expression CP
 actual_parameter_expression: %empty
                            | expression_list
 
-expression_list: expression
-               | expression COMMA expression_list
+expression_list: expression {std::cout << "expression:" <<$1 << std::endl;}
+               | expression COMMA expression_list {std::cout << "expression:" <<$1 << std::endl;}
 
-expression: simple_expression
-          | simple_expression relop expression
+expression: simple_expression {std::cout << "expression:" <<$1 << std::endl; $$ = $1;}
+          | simple_expression relop expression {std::cout << "expression:" <<$1 << std::endl; $$ = $1;}
 
-simple_expression: term
-                 | term addop simple_expression
+simple_expression: term {$$ = $1;}
+                 | term addop simple_expression {
+                   if($2 == token::PLUS) {$$ = $1 + $3;}
+                   else                  {$$ = $1 - $3;}
+                   }
 
-term: factor
-    | factor mulop term
+term: factor {$$ = $1;}
+    | factor mulop term {
+                         if($2 == token::MUL) {$$ = $1 * $3;}
+                         else                 {$$ = $1 / $3;}
+                        }
 
-factor: INTVAL
-      | FLOATVAL
-      | variable
-      | procedure_statement
-      | NOT factor
-      | sign factor
+factor: INTVAL {$$ = RValue(token::INT, VarValue($1));}
+      | FLOATVAL {$$ = RValue(token::FLOAT, VarValue($1));}
+      | variable {$$ = RValue(token::INT, VarValue(0));}
+      | procedure_statement {$$ = RValue(token::INT, VarValue(0));}
+      | NOT factor {$$ = $2;}
+      | sign factor {$$ = $2;}
 
 sign: PLUS
     | MINUS

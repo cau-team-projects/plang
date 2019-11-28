@@ -24,21 +24,27 @@ public:
     VarValue();
     VarValue(int i);
     VarValue(double d);
+    int getInt() const {return value.ival;}
+    double getFloat() const {return value.dval;}
 };
 
 class RValue{ //우측 값으로 올 수 있는 것들. int, float에 상관 없이 사칙연산이 가능하게 함.
               //연산 후의 타입은 (int, int)->int, (float가 하나라도 있으면)->float
               //만약 비교 연산자 RV > RV가 올 경우 int(1), int(0)으로 바꾸어서 쓸 것(아마 안 쓰일 듯)
     int type;
-    VarValue val;
+    VarValue value;
 
 public:
+    RValue() {};
     RValue(int type, VarValue val);
     ~RValue();
+    int getType() const;
+    VarValue getValue() const;
     friend RValue operator+(RValue& me, RValue& other);
     friend RValue operator-(RValue& me, RValue& other);
     friend RValue operator*(RValue& me, RValue& other);
     friend RValue operator/(RValue& me, RValue& other);
+    friend std::ostream& operator<<(std::ostream& os, const RValue& rval);
 };
 
 using Parser = yy::Parser;
@@ -65,8 +71,7 @@ private:
 	   그리고 스택에서 변수를 찾을 때는 위쪽 덩어리부터 각각의 덩어리에 대해 변수를 찾아서 만약 겹치는 이름이 있을 경우에는 가장 '안쪽'의 변수를 찾아올 수 있게 했습니다.
 	   함수 선언이 종료될 때 스택을 빼지 않으면 그 다음 함수에서도 이전 함수의 지역변수를 접근할 수 있기 때문에 함수가 종료될 때는 반드시 스택에서 제거해야 합니다.
 	*/
-    bool varValid(std::string name);
-
+    bool varValid(std::string name, Variable* v=NULL);
     friend Parser;
 public:
     explicit Driver(std::istream& in = std::cin, std::ostream& out = std::cout);
@@ -79,5 +84,5 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const VariableMap& vmap);
 std::ostream& operator<<(std::ostream& os, const std::vector<VariableMap> vstack);
-
+std::ostream& operator<<(std::ostream& os, const RValue& rval);
 #endif
