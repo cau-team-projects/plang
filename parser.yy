@@ -75,9 +75,15 @@ declaration_list: declaration declaration_list | %empty
 
 declaration: type identifier_list {
     if($1.second < 0){
-        std::cerr << "invalid case: Array with length " << $1.second << "  ";
-        for(auto& i: driver->id_list) { std::cerr << i << " ";}
-        std::cerr << "had been declared." << std::endl;
+        std::string msg = "Array with length ";
+        msg += std::to_string($1.second);
+        msg += "  ";
+        for(auto& i: driver->id_list) {
+            msg += i;
+            msg += " ";
+        }
+        msg += "had been declared.";
+        driver->error(@$, msg);
         return -1;
     }
     for(auto& i : driver->id_list) {
@@ -143,7 +149,10 @@ while_statement: WHILE expression DO statement END
 
 for_statement: FOR type ID IN expression DO statement END {
                    if($5.getType() == token::FLOAT) {
-                       std::cerr << "invalid case: 'for' structure try to run " << $5.getFloat() <<" times(non-integer times)" << std::endl;
+                       std::string msg = "\'for\' structure try to run ";
+                       msg += std::to_string($5.getFloat());
+                       msg += " times(non-integer times)";
+                       driver->error(@$, msg);
                        return -1;
                    }
                }
@@ -154,25 +163,44 @@ print_statement: PRINT {/*std::cout << driver->vstack << std::endl;*/}
 variable:
     ID {
         Variable v;
+        std::string msg;
         if(!driver->varValid($1, &v)) {
-            std::cerr << "invalid case: " << $1 << " is not declared." << std::endl;
+            msg = $1;
+            msg += " is not declared.";
+            driver->error(@$, msg);
             return -1;
         }
         if(v.first.second != 0){
-            std::cerr << "invalid case: " << $1 << " is not a array type." << std::endl;
+            msg = $1;
+            msg += " is not an array type.";
+            driver->error(@$, msg);
+            return -1;
         }
     } | ID OSB expression CSB{
         Variable v;
+        std::string msg;
         if(!driver->varValid($1, &v)) {
-            std::cerr << "invalid case: " << $1 << " is not declared." << std::endl;
+            msg = $1;
+            msg += " is not declared.";
+            driver->error(@$, msg);
             return -1;
         }
         if($3.getType() != token::INT){
-            std::cerr << "invalid case: Invalid array access " << $1 << "[" << $3.getFloat() << "]" << std::endl;
+            msg = "Invalid array access";
+            msg += $1;
+            msg += "[";
+            msg += std::to_string($3.getFloat());
+            msg += "]";
+            driver->error(@$, msg);
             return -1;
         }
         if($3.getInt() >= v.first.second || $3.getInt() < 0){
-            std::cerr << "invalid case: Invalid array access " << $1 << "[" << $3.getInt() << "]" << std::endl;
+            msg = "Invalid array access";
+            msg += $1;
+            msg += "[";
+            msg += std::to_string($3.getInt());
+            msg += "]";
+            driver->error(@$, msg);
             return -1;
         }
     }
@@ -199,7 +227,7 @@ term: factor {$$ = $1;}
                          if($2 == token::MUL) {$$ = $1 * $3;}
                          else                 {
                                                if(($3.getType() == token::INT && $3.getInt() == 0) || ($3.getType() == token::FLOAT && $3.getFloat() == 0.0f)){
-                                                   std::cerr << "invalid case: Divided by zero Error." << std::endl; return -1;
+                                                   driver->error(@$, "invalid case: Divided by zero Error."); return -1;
                                                }
                                                else {$$ = $1 / $3;}
                                               }
