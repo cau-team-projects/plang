@@ -186,7 +186,7 @@ variable:
             return -1;
         }
         if($3.getType() != token::INT){
-            msg = "Invalid array access";
+            msg = "Invalid array access ";
             msg += $1;
             msg += "[";
             msg += std::to_string($3.getFloat());
@@ -195,7 +195,7 @@ variable:
             return -1;
         }
         if($3.getInt() >= v.first.second || $3.getInt() < 0){
-            msg = "Invalid array access";
+            msg = "Invalid array access ";
             msg += $1;
             msg += "[";
             msg += std::to_string($3.getInt());
@@ -227,7 +227,7 @@ term: factor {$$ = $1;}
                          if($2 == token::MUL) {$$ = $1 * $3;}
                          else                 {
                                                if(($3.getType() == token::INT && $3.getInt() == 0) || ($3.getType() == token::FLOAT && $3.getFloat() == 0.0f)){
-                                                   driver->error(@$, "invalid case: Divided by zero Error."); return -1;
+                                                   driver->error(@$, "Divided by zero Error."); return -1;
                                                }
                                                else {$$ = $1 / $3;}
                                               }
